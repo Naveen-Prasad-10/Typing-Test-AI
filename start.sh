@@ -1,5 +1,5 @@
 #!/bin/bash
 export FLASK_APP=app.py
 export FLASK_ENV=production
-flask run --host=0.0.0.0 --port=${PORT:-5000}
+gunicorn -b 0.0.0.0:${PORT:-5000} app:app
 chmod +x start.sh

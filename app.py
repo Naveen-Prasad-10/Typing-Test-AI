@@ -80,7 +80,8 @@ def next_round():
         session['start_time'] = time.time()
         return render_template("index.html", sentence=sentence)
 
-# ✅ Deployment-friendly server start
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Use Railway's PORT
-    app.run(host='0.0.0.0', port=port, debug=True)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+

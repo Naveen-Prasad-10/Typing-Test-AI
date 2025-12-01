@@ -1,23 +1,24 @@
-import os  # <- needed for PORT
-from flask import Flask, render_template, request, redirect, url_for, session
+import os
+from flask import Flask, render_template, request, session
 import nltk
 import random
 import time
 from nltk.corpus import brown
 from nltk.tokenize import word_tokenize
 
+# Download necessary NLTK corpora
 nltk.download('brown')
 nltk.download('punkt')
 
 app = Flask(__name__)
-app.secret_key = "typingtestsecret"  # Needed for sessions
+app.secret_key = "typingtestsecret"
 
-# Function to generate a random sentence
+# Generate random sentence
 def generate_sentence():
     sentence = random.choice(brown.sents())
     return " ".join(sentence)
 
-# Function to calculate WPM
+# Calculate words per minute
 def calculate_wpm(typed_text, start_time, end_time):
     words = word_tokenize(typed_text)
     num_words = len(words)
@@ -27,7 +28,7 @@ def calculate_wpm(typed_text, start_time, end_time):
     wpm = num_words / elapsed_minutes
     return wpm, num_words
 
-# Function to calculate accuracy
+# Calculate typing accuracy
 def calculate_accuracy(original, typed):
     original_words = word_tokenize(original)
     typed_words = word_tokenize(typed)
@@ -37,6 +38,7 @@ def calculate_accuracy(original, typed):
 
 @app.route('/')
 def index():
+    # Initialize session stats
     session['all_wpm'] = []
     session['all_words'] = []
     session['all_accuracy'] = []
@@ -56,6 +58,7 @@ def submit():
     wpm, num_words = calculate_wpm(typed_text, start_time, end_time)
     accuracy = calculate_accuracy(original_sentence, typed_text)
 
+    # Update session stats
     session['all_wpm'].append(wpm)
     session['all_words'].append(num_words)
     session['all_accuracy'].append(accuracy)
@@ -67,6 +70,7 @@ def submit():
 def next_round():
     choice = request.form['choice'].strip().lower()
     if choice != 'y':
+        # Show overall statistics
         avg_wpm = sum(session['all_wpm']) / len(session['all_wpm'])
         avg_words = sum(session['all_words']) / len(session['all_words'])
         avg_accuracy = sum(session['all_accuracy']) / len(session['all_accuracy'])
@@ -81,7 +85,5 @@ def next_round():
         return render_template("index.html", sentence=sentence)
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-

@@ -17,8 +17,8 @@ Deployable on platforms like Railway, Heroku, or local servers.
 Demo
 
 You can access the live demo:
+https://typing-test-ai.onrender.com
 
-https://typing-test-ai.onrender.com)
 Technologies Used
 
 Python 3.10+

@@ -1,3 +1,4 @@
+import os  # <- needed for PORT
 from flask import Flask, render_template, request, redirect, url_for, session
 import nltk
 import random
@@ -36,7 +37,6 @@ def calculate_accuracy(original, typed):
 
 @app.route('/')
 def index():
-    # Initialize session stats
     session['all_wpm'] = []
     session['all_words'] = []
     session['all_accuracy'] = []
@@ -53,16 +53,13 @@ def submit():
     end_time = time.time()
     original_sentence = session['current_sentence']
 
-    # Calculate stats
     wpm, num_words = calculate_wpm(typed_text, start_time, end_time)
     accuracy = calculate_accuracy(original_sentence, typed_text)
 
-    # Update session stats
     session['all_wpm'].append(wpm)
     session['all_words'].append(num_words)
     session['all_accuracy'].append(accuracy)
 
-    # Ask user if they want another round
     return render_template("results.html", wpm=wpm, num_words=num_words,
                            accuracy=accuracy, avg=False)
 
@@ -70,7 +67,6 @@ def submit():
 def next_round():
     choice = request.form['choice'].strip().lower()
     if choice != 'y':
-        # Show overall statistics
         avg_wpm = sum(session['all_wpm']) / len(session['all_wpm'])
         avg_words = sum(session['all_words']) / len(session['all_words'])
         avg_accuracy = sum(session['all_accuracy']) / len(session['all_accuracy'])
@@ -84,5 +80,7 @@ def next_round():
         session['start_time'] = time.time()
         return render_template("index.html", sentence=sentence)
 
+# ✅ Deployment-friendly server start
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Use Railway's PORT
+    app.run(host='0.0.0.0', port=port, debug=True)
